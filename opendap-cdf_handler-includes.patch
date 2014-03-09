@@ -1,0 +1,30 @@
+--- cdf_handler-1.0.3/CDFreadAttributes.cc.orig	2007-01-10 17:05:43.000000000 +0100
++++ cdf_handler-1.0.3/CDFreadAttributes.cc	2014-03-08 19:32:16.264871314 +0100
+@@ -33,6 +33,7 @@
+  
+ #include <stdlib.h>
+ #include <stdio.h>
++#include <string.h>
+ 
+ #include "CDFreadAttributes.h"
+ #include "CDFutilities.h"
+--- cdf_handler-1.0.3/CDFutilities.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFutilities.cc	2014-03-08 19:38:56.384854522 +0100
+@@ -31,6 +31,7 @@
+ // Authors:
+ //      pwest       Patrick West <pwest@ucar.edu>
+ 
++#include <cstring>
+ #include <string>
+ #include <fstream>
+ 
+--- cdf_handler-1.0.3/CDFTypeFactory.h.orig	2008-02-02 22:27:34.000000000 +0100
++++ cdf_handler-1.0.3/CDFTypeFactory.h	2014-03-08 19:48:34.324830267 +0100
+@@ -39,6 +39,7 @@
+ // Class declarations; Make sure to include the corresponding headers in the
+ // implementation file.
+ 
++#include "BaseType.h"
+ #include "BaseTypeFactory.h"
+ 
+ using namespace libdap ;

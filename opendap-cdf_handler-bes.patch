@@ -1,0 +1,619 @@
+--- cdf_handler-1.0.3/CDFRequestHandler.cc.orig	2008-02-14 21:20:33.000000000 +0100
++++ cdf_handler-1.0.3/CDFRequestHandler.cc	2014-03-08 20:05:22.774787947 +0100
+@@ -44,18 +44,19 @@
+ 
+ #include "CDFRequestHandler.h"
+ #include "CDFTypeFactory.h"
+-#include "BESResponseHandler.h"
+-#include "BESResponseNames.h"
+-#include "BESDataNames.h"
++#include <BESResponseHandler.h>
++#include <BESResponseNames.h>
++#include <BESDapNames.h>
++#include <BESDataNames.h>
+ #include "CDFreadAttributes.h"
+-#include "BESDASResponse.h"
++#include <BESDASResponse.h>
+ #include "CDFreadDescriptors.h"
+-#include "BESDDSResponse.h"
+-#include "BESDataDDSResponse.h"
+-#include "BESConstraintFuncs.h"
+-#include "BESVersionInfo.h"
+-#include "TheBESKeys.h"
+-#include "BESInternalError.h"
++#include <BESDDSResponse.h>
++#include <BESDataDDSResponse.h>
++#include <BESConstraintFuncs.h>
++#include <BESVersionInfo.h>
++#include <TheBESKeys.h>
++#include <BESInternalError.h>
+ #include "config_cdf.h"
+ 
+ CDFRequestHandler::CDFRequestHandler( const string &name )
+@@ -174,7 +175,7 @@
+ CDFRequestHandler::cdf_build_version( BESDataHandlerInterface &dhi )
+ {
+     BESVersionInfo *info = dynamic_cast<BESVersionInfo *>(dhi.response_handler->get_response_object() ) ;
+-    info->addHandlerVersion( PACKAGE_NAME, PACKAGE_VERSION ) ;
++    info->add_module( PACKAGE_NAME, PACKAGE_VERSION ) ;
+     return true ;
+ }
+ 
+--- cdf_handler-1.0.3/CDFModule.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFModule.cc	2014-03-08 20:20:59.241415314 +0100
+@@ -48,41 +48,41 @@
+ void
+ CDFModule::initialize( const string &modname )
+ {
+-    BESDEBUG( "cdf", "Initializing CDF module " << modname << endl )
++    BESDEBUG( "cdf", "Initializing CDF module " << modname << endl ) ;
+ 
+-    BESDEBUG( "cdf", "    adding " << modname << " request handler" << endl )
++    BESDEBUG( "cdf", "    adding " << modname << " request handler" << endl ) ;
+     BESRequestHandler *handler = new CDFRequestHandler( modname ) ;
+     BESRequestHandlerList::TheList()->add_handler( modname, handler ) ;
+ 
+-    BESDEBUG( "cdf", "    adding " << CDF_CATALOG << " catalog" << endl )
++    BESDEBUG( "cdf", "    adding " << CDF_CATALOG << " catalog" << endl ) ;
+     BESCatalogList::TheCatalogList()->add_catalog( new BESCatalogDirectory( CDF_CATALOG) ) ;
+ 
+-    BESDEBUG( "cdf", "    adding catalog container storage " << CDF_CATALOG << endl )
++    BESDEBUG( "cdf", "    adding catalog container storage " << CDF_CATALOG << endl ) ;
+     BESContainerStorageCatalog *csc = new BESContainerStorageCatalog( CDF_CATALOG ) ;
+     BESContainerStorageList::TheList()->add_persistence( csc ) ;
+ 
+-    BESDEBUG( "cdf", "    adding cdf debug context" << endl )
++    BESDEBUG( "cdf", "    adding cdf debug context" << endl ) ;
+     BESDebug::Register( "cdf" ) ;
+ 
+-    BESDEBUG( "cdf", "Done Initializing CDF module " << modname << endl )
++    BESDEBUG( "cdf", "Done Initializing CDF module " << modname << endl ) ;
+ }
+ 
+ void
+ CDFModule::terminate( const string &modname )
+ {
+-    BESDEBUG( "cdf", "Cleaning CDF module " << modname << endl )
++    BESDEBUG( "cdf", "Cleaning CDF module " << modname << endl ) ;
+ 
+-    BESDEBUG( "cdf", "    removing CDF Handler" << modname << endl )
++    BESDEBUG( "cdf", "    removing CDF Handler" << modname << endl ) ;
+     BESRequestHandler *rh = BESRequestHandlerList::TheList()->remove_handler( modname ) ;
+     if( rh ) delete rh ;
+ 
+-    BESDEBUG( "cdf", "    removing catalog container storage" << CDF_CATALOG << endl )
+-    BESContainerStorageList::TheList()->del_persistence( CDF_CATALOG ) ;
++    BESDEBUG( "cdf", "    removing catalog container storage" << CDF_CATALOG << endl ) ;
++    BESContainerStorageList::TheList()->deref_persistence( CDF_CATALOG ) ;
+ 
+-    BESDEBUG( "cdf", "    removing " << CDF_CATALOG << " catalog" << endl )
+-    BESCatalogList::TheCatalogList()->del_catalog( CDF_CATALOG ) ;
++    BESDEBUG( "cdf", "    removing " << CDF_CATALOG << " catalog" << endl ) ;
++    BESCatalogList::TheCatalogList()->deref_catalog( CDF_CATALOG ) ;
+ 
+-    BESDEBUG( "cdf", "Done Cleaning CDF module " << modname << endl )
++    BESDEBUG( "cdf", "Done Cleaning CDF module " << modname << endl ) ;
+ }
+ 
+ /** @brief dumps information about this object
+--- cdf_handler-1.0.3/CDFArray.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFArray.cc	2014-03-08 20:22:28.398078241 +0100
+@@ -106,7 +106,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFArray: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFArray: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -173,21 +173,21 @@
+ 
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
+ 	for( unsigned int i_numDims = 0; i_numDims < numDims; i_numDims++ )
+ 	{
+-	    BESDEBUG( "cdf", "    dimSizes[" << i_numDims << "] = " << dimSizes[i_numDims] << endl )
+-	    if( dimVarys[i_numDims] == VARY )
+-		BESDEBUG( "cdf", "    dimVarys[" << i_numDims << "] = VARY" << endl )
+-	    else
+-		BESDEBUG( "cdf", "    dimVarys[" << i_numDims << "] = NOVARY" << endl )
+-	}
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	if( recVary == VARY ) BESDEBUG( "cdf", "  recVary = VARY" << endl )
+-	else BESDEBUG( "cdf", "  recVary = VARY" << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	    BESDEBUG( "cdf", "    dimSizes[" << i_numDims << "] = " << dimSizes[i_numDims] << endl ) ;
++	    if( dimVarys[i_numDims] == VARY ) {
++		BESDEBUG( "cdf", "    dimVarys[" << i_numDims << "] = VARY" << endl ) ;
++	    } else
++		BESDEBUG( "cdf", "    dimVarys[" << i_numDims << "] = NOVARY" << endl ) ;
++	}
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	if( recVary == VARY ) { BESDEBUG( "cdf", "  recVary = VARY" << endl ) ; }
++	else BESDEBUG( "cdf", "  recVary = VARY" << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+     if( numRecs == 0 )
+     {
+@@ -208,7 +208,7 @@
+ 	    }
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     unsigned long relements = 1 ;
+     for( anindex = 0; anindex < numDims; anindex++ )
+@@ -221,19 +221,19 @@
+ 	{
+ 	    counts[anindex] = 1 ;
+ 	}
+-	BESDEBUG( "cdf", "  counts[" << anindex << "] = " << counts[anindex] << endl )
++	BESDEBUG( "cdf", "  counts[" << anindex << "] = " << counts[anindex] << endl ) ;
+ 	relements = relements * counts[anindex] ;
+     }
+-    BESDEBUG( "cdf", "  relements = " << relements << endl )
++    BESDEBUG( "cdf", "  relements = " << relements << endl ) ;
+ 
+     // telements is the total number of elements to read
+     unsigned long telements = relements * numRecs ;
+-    BESDEBUG( "cdf", "  telements = " << telements << endl )
++    BESDEBUG( "cdf", "  telements = " << telements << endl ) ;
+ 
+     // rsize is the record size given the number of elements per record and
+     // the size of each element
+     unsigned long rsize = relements * varTypeSize ;
+-    BESDEBUG( "cdf", "  rsize = " << rsize << endl )
++    BESDEBUG( "cdf", "  rsize = " << rsize << endl ) ;
+ 
+     // allocate the buffer that will read each of the records
+     cdf_buf = malloc( rsize+1 ) ;
+--- cdf_handler-1.0.3/CDFByte.cc.orig	2014-03-08 18:51:20.584974368 +0100
++++ cdf_handler-1.0.3/CDFByte.cc	2014-03-08 20:23:04.531410057 +0100
+@@ -110,7 +110,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFByte: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFByte: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -177,12 +177,12 @@
+ 
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_BYTE )
+@@ -211,7 +211,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -246,7 +246,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << (int)d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << (int)d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFFloat32.cc.orig	2014-03-08 18:55:23.834964161 +0100
++++ cdf_handler-1.0.3/CDFFloat32.cc	2014-03-08 20:23:39.871408572 +0100
+@@ -110,7 +110,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFFloat32: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFFloat32: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -176,12 +176,12 @@
+     }
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_REAL4 && varType != CDF_FLOAT )
+@@ -211,7 +211,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -246,7 +246,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+ 			       numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFFloat64.cc.orig	2014-03-08 18:56:55.804960301 +0100
++++ cdf_handler-1.0.3/CDFFloat64.cc	2014-03-08 20:24:08.501407371 +0100
+@@ -109,7 +109,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFFloat64: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFFloat64: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -174,12 +174,12 @@
+     }
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_REAL8 && varType != CDF_DOUBLE && varType != CDF_EPOCH )
+@@ -209,7 +209,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -244,7 +244,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFInt16.cc.orig	2014-03-08 18:57:35.551625300 +0100
++++ cdf_handler-1.0.3/CDFInt16.cc	2014-03-08 20:24:38.768072768 +0100
+@@ -108,7 +108,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFInt16: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFInt16: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -175,12 +175,12 @@
+ 
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_INT2 && varType != CDF_INT1 )
+@@ -210,7 +210,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -245,7 +245,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFInt32.cc.orig	2014-03-08 18:58:48.084955588 +0100
++++ cdf_handler-1.0.3/CDFInt32.cc	2014-03-08 20:25:43.451403387 +0100
+@@ -108,7 +108,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFInt32: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFInt32: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -175,12 +175,12 @@
+ 
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_INT4 )
+@@ -209,7 +209,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -244,7 +244,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFStr.cc.orig	2014-03-08 18:59:18.498287646 +0100
++++ cdf_handler-1.0.3/CDFStr.cc	2014-03-08 20:31:17.824722687 +0100
+@@ -109,7 +109,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFStr: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFStr: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -175,12 +175,12 @@
+     }
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_CHAR && varType != CDF_UCHAR )
+@@ -210,7 +210,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -246,7 +246,7 @@
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+ 			       numElems, varType, numElems ) ;
+ 
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFUInt16.cc.orig	2014-03-08 19:02:21.088279984 +0100
++++ cdf_handler-1.0.3/CDFUInt16.cc	2014-03-08 20:31:56.774721055 +0100
+@@ -110,7 +110,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFUInt16: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFUInt16: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -177,12 +177,12 @@
+ 
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_UINT2 && varType != CDF_UINT1)
+@@ -212,7 +212,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -247,7 +247,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFUInt32.cc.orig	2014-03-08 19:10:26.564926277 +0100
++++ cdf_handler-1.0.3/CDFUInt32.cc	2014-03-08 20:32:47.081385609 +0100
+@@ -110,7 +110,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "CDFUInt32: " << name() << ": Opening " << dataset << endl )
++    BESDEBUG( "cdf", "CDFUInt32: " << name() << ": Opening " << dataset << endl ) ;
+     status = CDFopen ( dataset.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -176,12 +176,12 @@
+     }
+     if( BESISDEBUG( "cdf" ) )
+     {
+-	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-	BESDEBUG( "cdf", "  numDims = " << numDims << endl )
+-	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl )
+-	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-	BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-	BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++	BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++	BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
++	BESDEBUG( "cdf", "  maxRec = " << maxRec << endl ) ;
++	BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++	BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++	BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+     }
+ 
+     if( varType != CDF_UINT4 )
+@@ -210,7 +210,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
++    BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl ) ;
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+     arrbuf = (void *)&d_buf ;
+@@ -245,7 +245,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+ 			       numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl ) ;
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFreadDescriptors.cc.orig	2014-03-08 19:34:52.801531410 +0100
++++ cdf_handler-1.0.3/CDFreadDescriptors.cc	2014-03-08 20:33:28.918050519 +0100
+@@ -85,7 +85,7 @@
+     /*************************************************************************
+     * Open the CDF.
+     *************************************************************************/
+-    BESDEBUG( "cdf", "Opening CDF file " << filename << endl )
++    BESDEBUG( "cdf", "Opening CDF file " << filename << endl ) ;
+     status = CDFopen ( filename.c_str(), &id ) ;
+     if ( status != CDF_OK )
+     {
+@@ -122,7 +122,7 @@
+ 	    return false ;
+ 	}
+     }
+-    BESDEBUG( "cdf", "  numVars = " << numVars << endl )
++    BESDEBUG( "cdf", "  numVars = " << numVars << endl ) ;
+ 
+     /*************************************************************************
+     * Get and display variable information
+@@ -160,18 +160,18 @@
+ 
+ 	    if( BESISDEBUG( "cdf" ) )
+ 	    {
+-		BESDEBUG( "cdf", "varName: " << varName << endl )
+-		BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl )
+-		BESDEBUG( "cdf", "  numDims = " << numDims << endl )
++		BESDEBUG( "cdf", "varName: " << varName << endl ) ;
++		BESDEBUG( "cdf", "  varType = " << CDFutilities::DataType( varType ) << endl ) ;
++		BESDEBUG( "cdf", "  numDims = " << numDims << endl ) ;
+ 		unsigned int i_numDims = 0 ;
+ 		for( i_numDims = 0; i_numDims < numDims; i_numDims++ )
+ 		{
+-		    BESDEBUG( "cdf", "    dimSizes[" << i_numDims << "] = " << dimSizes[i_numDims] << endl )
+-		    BESDEBUG( "cdf", "    dimVarys[" << i_numDims << "] = " << dimVarys[i_numDims] << endl )
++		    BESDEBUG( "cdf", "    dimSizes[" << i_numDims << "] = " << dimSizes[i_numDims] << endl ) ;
++		    BESDEBUG( "cdf", "    dimVarys[" << i_numDims << "] = " << dimVarys[i_numDims] << endl ) ;
+ 		}
+-		BESDEBUG( "cdf", "  numRecs = " << numRecs << endl )
+-		BESDEBUG( "cdf", "  recVary = " << recVary << endl )
+-		BESDEBUG( "cdf", "  numElems = " << numElems << endl )
++		BESDEBUG( "cdf", "  numRecs = " << numRecs << endl ) ;
++		BESDEBUG( "cdf", "  recVary = " << recVary << endl ) ;
++		BESDEBUG( "cdf", "  numElems = " << numElems << endl ) ;
+ 	    }
+ 
+ 	    BaseType *var = 0 ;
+--- cdf_handler-1.0.3/CDFutilities.cc.orig	2014-03-08 19:38:56.384854522 +0100
++++ cdf_handler-1.0.3/CDFutilities.cc	2014-03-08 20:38:54.271370201 +0100
+@@ -481,7 +481,7 @@
+ 	    dods_int32 *my_buf = (dods_int32 *)arrbuf ;
+ 	    for( anindex = 0; anindex < numElements; anindex++ )
+ 	    {
+-		BESDEBUG( "cdf", "    val = " << my_buf[anindex] << endl )
++		BESDEBUG( "cdf", "    val = " << my_buf[anindex] << endl ) ;
+ 	    }
+ 	}
+ 	break ;

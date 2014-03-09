@@ -1,0 +1,251 @@
+--- cdf_handler-1.0.3/CDFByte.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFByte.cc	2014-03-08 18:49:57.394977860 +0100
+@@ -214,7 +214,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -246,7 +246,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << (int)_buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << (int)d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFFloat32.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFFloat32.cc	2014-03-08 18:55:23.834964161 +0100
+@@ -214,7 +214,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -246,7 +246,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+ 			       numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFFloat64.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFFloat64.cc	2014-03-08 18:56:55.804960301 +0100
+@@ -212,7 +212,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( !numRecs ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -244,7 +244,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFInt16.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFInt16.cc	2014-03-08 18:57:35.551625300 +0100
+@@ -213,7 +213,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -245,7 +245,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFInt32.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFInt32.cc	2014-03-08 18:58:48.084955588 +0100
+@@ -212,7 +212,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -244,7 +244,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFStr.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFStr.cc	2014-03-08 18:59:18.498287646 +0100
+@@ -213,7 +213,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -246,7 +246,7 @@
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+ 			       numElems, varType, numElems ) ;
+ 
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFUInt16.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFUInt16.cc	2014-03-08 19:02:21.088279984 +0100
+@@ -215,7 +215,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -247,7 +247,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+                                numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFUInt32.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFUInt32.cc	2014-03-08 19:10:26.564926277 +0100
+@@ -213,7 +213,7 @@
+     BESDEBUG( "cdf", "  varTypeSize = " << varTypeSize << endl )
+ 
+     cdf_buf = malloc( varTypeSize ) ;
+-    arrbuf = (void *)&_buf ;
++    arrbuf = (void *)&d_buf ;
+ 
+     if( numRecs == 0 ) numRecs = 1 ;
+     status = CDFlib( SELECT_, zVAR_RECCOUNT_, (long)1,
+@@ -245,7 +245,7 @@
+     unsigned int arrindex = 0 ;
+     CDFutilities::read_record( cdf_buf, arrbuf, arrindex,
+ 			       numElems, varType, numElems ) ;
+-    BESDEBUG( "cdf", "  _buf = " << _buf << endl )
++    BESDEBUG( "cdf", "  d_buf = " << d_buf << endl )
+ 
+     /*************************************************************************
+     * Close CDF.
+--- cdf_handler-1.0.3/CDFreadDescriptors.h.orig	2008-02-02 22:27:34.000000000 +0100
++++ cdf_handler-1.0.3/CDFreadDescriptors.h	2014-03-08 19:34:34.864865496 +0100
+@@ -35,7 +35,7 @@
+ #define CDFreadDescriptors_h_ 1
+ 
+ #include <DDS.h>
+-#include <cgi_util.h>
++#include <mime_util.h>
+ #include <DODSFilter.h>
+ 
+ using namespace libdap ;
+--- cdf_handler-1.0.3/CDFreadDescriptors.cc.orig	2007-07-31 20:33:14.000000000 +0200
++++ cdf_handler-1.0.3/CDFreadDescriptors.cc	2014-03-08 19:34:52.801531410 +0100
+@@ -43,7 +43,7 @@
+ #include "CDFreadDescriptors.h"
+ #include "CDFutilities.h"
+ #include "CDFArray.h"
+-#include "cgi_util.h"
++#include <mime_util.h>
+ 
+ /*
+  * Current method of reading the data from  a CDF file:
+--- cdf_handler-1.0.3/dap_cdf_handler.cc.orig	2007-08-01 17:04:11.000000000 +0200
++++ cdf_handler-1.0.3/dap_cdf_handler.cc	2014-03-08 19:35:18.444863668 +0100
+@@ -36,6 +36,7 @@
+ #include <iostream>
+ #include <string>
+ 
++#include <Ancillary.h>
+ #include "DODSFilter.h"
+ #include "DDS.h"
+ #include "DAS.h"
+@@ -42,7 +43,7 @@
+ #include "DataDDS.h"
+ 
+ #include "ObjectType.h"
+-#include "cgi_util.h"
++#include <mime_util.h>
+ #include "ConstraintEvaluator.h"
+ 
+ #include "CDFTypeFactory.h"
+@@ -66,7 +67,7 @@
+ 	    DAS das;
+ 
+ 	    readAttributes(das, df.get_dataset_name());
+-	    df.read_ancillary_das(das);
++	    Ancillary::read_ancillary_das(das, df.get_dataset_name());
+ 	    df.send_das(das);
+ 	    break;
+ 	  }
+@@ -77,11 +78,11 @@
+ 
+ 	    string dsn = df.get_dataset_name();
+ 	    readDescriptors( dds, dsn, name_path( dsn ) ) ;
+-	    df.read_ancillary_dds(dds);
++	    Ancillary::read_ancillary_dds(dds, dsn);
+ 
+ 	    DAS das;
+ 	    readAttributes(das, df.get_dataset_name());
+-	    df.read_ancillary_das(das);
++	    Ancillary::read_ancillary_das(das, dsn);
+ 
+ 	    dds.transfer_attributes(&das);
+ 	    df.send_dds(dds, ce, true);
+@@ -95,11 +96,11 @@
+ 	    string dsn = df.get_dataset_name();
+ 	    dds.filename( dsn ) ;
+ 	    readDescriptors( dds, dsn, name_path( dsn ) ) ;
+-	    df.read_ancillary_dds(dds);
++	    Ancillary::read_ancillary_dds(dds, dsn);
+ 
+ 	    DAS das;
+ 	    readAttributes(das, df.get_dataset_name());
+-	    df.read_ancillary_das(das);
++	    Ancillary::read_ancillary_das(das, dsn);
+ 
+ 	    dds.transfer_attributes(&das);
+ 	    df.send_data(dds, ce, stdout);
+@@ -116,10 +117,10 @@
+ 	    dds.filename( dsn ) ;
+ 
+ 	    readDescriptors(dds, dsn, name_path( dsn ) ) ;
+-	    df.read_ancillary_dds(dds);
++	    Ancillary::read_ancillary_dds(dds, dsn);
+ 
+ 	    readAttributes( das, dsn ) ;
+-	    df.read_ancillary_das(das);
++	    Ancillary::read_ancillary_das(das, dsn);
+ 
+ 	    dds.transfer_attributes(&das);
+ 
