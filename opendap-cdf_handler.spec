@@ -49,7 +49,7 @@ DAP2 oraz oprogramowaniem dap-server.
 %{__automake}
 %configure \
 	--disable-static \
-	--with-cdf-include=%{_includedir} \
+	--with-cdf-include=%{_includedir}/cdf \
 	--with-cdf-libdir=%{_libdir}
 %{__make}
 
