@@ -2,7 +2,7 @@ Summary:	CDF 3 data handler for the OPeNDAP data server
 Summary(pl.UTF-8):	Moduł obsługujący dane CDF 3 dla serwera danych OPeNDAP
 Name:		opendap-cdf_handler
 Version:	1.0.3
-Release:	2
+Release:	3
 License:	LGPL v2.1+
 Group:		Daemons
 Source0:	http://www.opendap.org/pub/source/cdf_handler-%{version}.tar.gz
