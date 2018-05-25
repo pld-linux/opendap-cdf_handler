@@ -30,6 +30,15 @@
  #include "config_cdf.h"
  
  CDFRequestHandler::CDFRequestHandler( const string &name )
+@@ -126,7 +126,7 @@
+ {
+     BESDataDDSResponse *bdds =
+ 	dynamic_cast<BESDataDDSResponse *>( dhi.response_handler->get_response_object() ) ;
+-    DataDDS *dds = bdds->get_dds() ;
++    DDS *dds = bdds->get_dds() ;
+ 
+     CDFTypeFactory *factory = new CDFTypeFactory ;
+     dds->set_factory( factory ) ;
 @@ -174,7 +175,7 @@
  CDFRequestHandler::cdf_build_version( BESDataHandlerInterface &dhi )
  {
